@@ -12,7 +12,7 @@ def init(parent_parser):
     from aer.commands import do
 
     doParser = parent_parser.add_parser(
-        'vcs', help='Version control systems for easy interaction with needed repositoreis, be them yours or third party\'s  ', conflict_handler='resolve')  # add_help=False,
+        'vcs', help='Version control systems for easy interaction with needed repositories, be them yours or third party\'s  ', conflict_handler='resolve')  # add_help=False,
     doParser.set_defaults(entrypoint=entrypoint)
 
     group6 = doParser.add_argument_group("Enviroment management parameters")
