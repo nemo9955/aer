@@ -63,6 +63,7 @@ def push_libs():
             if "nothing to commit" in stat_str:
                 continue
             local("git status")
+            print(cyan(str(libd.root_path)) + "/" + green(str(libd.folder)))
             comm_message = prompt(
                 "Add commit message, blank to skip this repo:")
             if comm_message.strip() == "":
