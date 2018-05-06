@@ -19,7 +19,7 @@ from fabric.contrib import files
 from fabric.contrib.console import confirm
 from fabric.contrib.files import exists as texists
 
-from aer import config, utils
+from aer import utils
 # from aer.api import *
 from states_db import odb
 from utils import EasyDict, RecursiveFormatter

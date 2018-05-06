@@ -8,7 +8,7 @@ from os.path import join as pjoin
 from fabric.api import cd, env, execute, quiet, run,put
 from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 
-from aer import config, utils
+from aer import  utils
 from states_db import odb
 
 # pylint: disable=I0011,E1129

@@ -1,3 +1,4 @@
+# pylint: disable=I0011,E1129,E0611
 from __future__ import absolute_import, division, print_function
 
 import datetime
@@ -8,7 +9,7 @@ import uuid
 from os.path import exists as fexists
 from os.path import join as pjoin
 
-from fabric.api import *
+# from fabric.api import *
 from fabric.api import env, lcd, local, prompt, quiet
 from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 
@@ -18,7 +19,6 @@ from utils import EasyDict, RecursiveFormatter
 
 # from aer.states_db import odb
 
-# pylint: disable=I0011,E1129
 
 
 def entrypoint():
@@ -34,8 +34,9 @@ def entrypoint():
     if odb.arg.list_local_libs:
         list_all_libs(just_local=True)
 
-    print(json.dumps(odb.pth,indent=3))
+    # print(json.dumps(odb.pth, indent=3))
     # print(json.dumps(odb,indent=3))
+
 
 def list_all_libs(just_local=False):
     for libd in libs_iterator():
@@ -43,7 +44,7 @@ def list_all_libs(just_local=False):
             continue
         print(cyan(libd.full_path))
         if odb.arg.list_more_details:
-            print(json.dumps(libd,indent=4))
+            print(json.dumps(libd, indent=4))
 
 
 def push_libs():
@@ -70,13 +71,13 @@ def push_libs():
             local(libd.push_command)
 
 
-
 def update_project(libd):
     if not odb.arg.libs_update:
         return False
 
     if libd.slow and not odb.arg.including_slow:
-        print(yellow(libd.format("Skipping {folder} because update slow are disabled")))
+        print(
+            yellow(libd.format("Skipping {folder} because update slow are disabled")))
         return False
 
     if not lib_exists(libd):
@@ -92,7 +93,7 @@ def update_project(libd):
 
 def libs_iterator():
     for lib_ in odb.libs_manager.values():
-        if not isinstance( lib_, dict):
+        if not isinstance(lib_, dict):
             continue
         for grepo_ in lib_.get("git_repo", []):
             libd = EasyDict()
@@ -121,13 +122,17 @@ def ensure_libs():
             continue
 
         if libd.slow and not odb.arg.including_slow:
-            print(yellow(libd.format("Skipping {folder} because 'slow=True' are excluded")))
+            print(
+                yellow(libd.format("Skipping {folder} because 'slow=True' are excluded")))
             continue
 
         fresh_get = False
 
         if lib_exists(libd):
             update_project(libd)
+
+        if lib_exists(libd):
+            pass
         elif libd.obtain_type == "git_clone":
             fresh_get = get_using_command(libd)
         elif libd.obtain_type == "github_latest":
@@ -154,12 +159,11 @@ def get_using_wget(libd):
     return local(libd.format("cd {root_path} && wget {download_url}")).succeeded
 
 
-
 def get_using_latest(libd):
     if not (libd.has.download_url and libd.has.validate_latest):
         print(red("Must have download_url and validate_latest " + str(libd)))
         return False
-    body_string=None
+    body_string = None
 
     with quiet():
         latest_getc = libd.format("curl {download_url}/releases/latest")
@@ -180,12 +184,12 @@ def get_using_latest(libd):
         with quiet():
             body_string = local("curl " + the_url, capture=True)
     else:
-        body_string=latest_body
+        body_string = latest_body
 
     if body_string is None:
         return False
 
-    dld_body=body_string.split("\"")
+    dld_body = body_string.split("\"")
 
     dld_url = None
     for some_str_ in dld_body:
@@ -202,7 +206,8 @@ def get_using_latest(libd):
 
     dld_url = "https://github.com" + dld_url
     print(cyan("Downloading latest github release : " + dld_url))
-    res = local(libd.format(        "cd {root_path} && wget {0}", dld_url), capture=True)
+    res = local(libd.format(
+        "cd {root_path} && wget {0}", dld_url), capture=True)
     # res = local("cd {root_path} && wget {dld_url} ".format(
     #     dld_url=dld_url, **libd), capture=True)
     return res.succeeded
@@ -221,16 +226,14 @@ def lib_exists(libd):
     """
     Returns True/False if the library/project/repository is present on the local dev machine
     """
-    # TODO  make so it will default to checking "test -d {root_path}/{folder}"
-    # repo_path = pjoin(libd.root_path, libd.folder)
     return fexists(libd.full_path)
 
 
-def link_dependencies():
-    esp8266_libs = pjoin(odb.pth.trd_deploy_libs, "esp8266/")
-    print()
-    # print( odb.pth.node_dir)
-    print(odb.pth.trd_sketch_libs)
+# def link_dependencies():
+#     esp8266_libs = pjoin(odb.pth.trd_deploy_libs, "esp8266/")
+#     print()
+#     # print( odb.pth.node_dir)
+#     print(odb.pth.trd_sketch_libs)
 
 
 def lib_get_parent_path(lib_):

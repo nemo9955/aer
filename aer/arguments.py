@@ -10,7 +10,7 @@ from fabric.api import env, lcd, local, quiet
 from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 
 import file_db_handler
-from aer import commands, config, utils
+from aer import commands, utils
 from states_db import odb
 from utils import EasyDict, RecursiveFormatter
 

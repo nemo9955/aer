@@ -40,12 +40,19 @@ def entrypoint():
     #     file_db_handler.generate_user_db()
 
     if odb.arg.build_protobuf:
-        local("cd {0}/RespirMesh/protobuf && mkdir -p rem_nanopb_pb  && {0}/3rd-party/nanopb_protobuf/generator-bin/protoc  --nanopb_out=./rem_nanopb_pb *.proto ".format(odb.pth.root))
-        go_ok = local(
-            "cd {0}/RespirMesh/protobuf && mkdir -p rem_go_pb && {0}/3rd-party/google_protoc/bin/protoc --go_out=./rem_go_pb  *.proto ".format(odb.pth.root)).succeeded
+        local(str("cd {0}/RespirMesh/protobuf && " +
+                  "mkdir -p {0}/RespirMesh/protobuf/rem_nanopb_pb  && " +
+                  "{0}/3rd-party/nanopb_protobuf/generator-bin/protoc  --proto_path={0}/RespirMesh/protobuf --nanopb_out={0}/RespirMesh/protobuf/rem_nanopb_pb {0}/RespirMesh/protobuf/*.proto ").format(odb.pth.root))
+
+        go_ok = local(str(
+            "cd {0}/RespirMesh/protobuf && " +
+            "mkdir -p {0}/RespirMesh/protobuf/rem_go_pb && " +
+            "{0}/3rd-party/google_protoc/bin/protoc --proto_path={0}/RespirMesh/protobuf --go_out={0}/RespirMesh/protobuf/rem_go_pb  {0}/RespirMesh/protobuf/*.proto ").format(odb.pth.root)).succeeded
+
         if not go_ok:
             print(cyan("Maybe run"))
             print(yellow("export GOPATH=$HOME/gopath"))
             print(yellow("export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin"))
             print(yellow("go get -u github.com/golang/protobuf/protoc-gen-go"))
+
         local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))

@@ -1,3 +1,4 @@
+# pylint: disable=I0011,E1129,E0611
 from __future__ import absolute_import, division, print_function
 
 import copy
@@ -15,8 +16,6 @@ from fabric.contrib.console import confirm
 # from aer.utils import EasyDict
 from states_db import odb
 from utils import EasyDict, RecursiveFormatter
-
-# pylint: disable=I0011,E1129
 
 
 def handle():
@@ -39,7 +38,6 @@ def handle():
     write_to_db(odb.pth.cache_db, {"cache": odb.cache})
 
 
-
 def update_fabric_env():
     for key_, val_ in odb.env.items():
         env[key_] = val_
@@ -56,7 +54,7 @@ def generate_user_db():
 def load_file_db(db_path):
     if fexists(db_path):
         with open(db_path) as datafile_db:
-            data = json.load(datafile_db,object_hook=EasyDict)
+            data = json.load(datafile_db, object_hook=EasyDict)
             transfer_missing_elements(odb, data)
 
 
@@ -64,7 +62,7 @@ def transfer_missing_elements(target_dict, source_dict):
     """Transferes missing elements from source to target recusevly
     """
 
-    for key_,val_ in source_dict.items():
+    for key_, val_ in source_dict.items():
         if isinstance(val_, dict):
             if key_ not in target_dict:
                 target_dict[key_] = EasyDict()
@@ -75,7 +73,7 @@ def transfer_missing_elements(target_dict, source_dict):
             elif transfer_type == "update":
                 target_dict[key_].update(val_)
             elif transfer_type == "overwrite":
-                target_dict[key_]=val_
+                target_dict[key_] = val_
 
         # if isinstance(source_dict[key_],list) and  isinstance(source_dict[key_][0],dict):
         #     if key_ not in target_dict:

@@ -1,3 +1,4 @@
+# pylint: disable=I0011,E1129,E0611
 from __future__ import absolute_import, division, print_function
 
 import os
@@ -7,9 +8,6 @@ from os.path import join as pjoin
 from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 
 from utils import EasyDict, RecursiveFormatter
-
-# pylint: disable=I0011,E1129
-
 
 odb = EasyDict()
 
@@ -142,7 +140,7 @@ odb.libs_manager = EasyDict({
     "_transfer_type_": "update",
 })
 
-odb.libs_manager.NODE_BUILD_LIBS = EasyDict({
+odb.libs_manager.BOARDS_BUILD_LIBS = EasyDict({
     "pth_full": None,
     "_transfer_type_": "update",
     "pth_alias": "trd_deploy_libs",
@@ -191,6 +189,7 @@ odb.libs_manager.GOOGLE_PROTOBUF_1 = EasyDict({
         {
             "url": "git@github.com:google/protobuf.git",
             "download_url": "https://github.com/google/protobuf",
+            "update_command": "rm -rf {full_path} ",
             "obtain_type": "github_latest",
             "after_command": "test -e protoc-*.zip && unzip protoc-*.zip -d {folder} && rm protoc-*.zip ",
             "validate_latest": "/google/protobuf/releases/download/\S*/protoc-\S*linux-x86_64\\.zip",
@@ -207,29 +206,15 @@ odb.libs_manager.NANOPB_PROTOBUF_1 = EasyDict({
             "url": "https://github.com/nanopb/nanopb",
             "download_url": "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9-linux-x86.tar.gz",
             "obtain_type": "wget_direct",
-            "update_command": " ",
+            "update_command": "rm -rf {full_path} ",
             "after_command": "cd {root_path} && test -e nanopb-*.tar.gz && mkdir -p {folder} && rm -rf {folder}/*  && tar -xzf nanopb-*.tar.gz -C {folder} && mv {folder}/nanopb*/* {folder}/  && rm nanopb-*.tar.gz ",
             "folder": "nanopb_protobuf"
         }
     ]
 })
 
-odb.libs_manager.NANOPB_PROTOBUF_1 = EasyDict({
-    "pth_alias": "root",
-    "_transfer_type_": "update",
-    "git_repo": [
-        {
-            "url": "https://github.com/kashimAstro/SimpleNetwork",
-            "get_command": "git clone {url} {folder} && cd {folder} && mv .git __GIT_IGNORE_GIT",
-            "push_command": " ",
-            "update_command": " cd {folder} && mv __GIT_IGNORE_GIT .git && git pull && mv .git __GIT_IGNORE_GIT",
-            "folder": "RespirMesh/SimpleNetwork"
-        }
-    ]
-})
 
-
-odb.libs_manager.DEV_LIBS_PUSH = EasyDict({
+odb.libs_manager.NEMO9955_LIBS_PUSH = EasyDict({
     "pth_alias": "root",
     "can_push": True,
     "_transfer_type_": "update",
@@ -248,6 +233,20 @@ odb.libs_manager.DEV_LIBS_PUSH = EasyDict({
             "folder": "EspCar"}
     ]
 })
+
+# odb.libs_manager.SIMPLE_NET = EasyDict({
+#     "pth_alias": "root",
+#     "_transfer_type_": "update",
+#     "git_repo": [
+#         {
+#             "url": "https://github.com/kashimAstro/SimpleNetwork",
+#             "get_command": "git clone {url} {folder} && cd {folder} && mv .git __GIT_IGNORE_GIT",
+#             "push_command": " ",
+#             "update_command": " cd {folder} && mv __GIT_IGNORE_GIT .git && git pull && mv .git __GIT_IGNORE_GIT",
+#             "folder": "RespirMesh/SimpleNetwork"
+#         }
+#     ]
+# })
 
 
 odb.libs_manager.ARDU_NEEDED_LIBS = EasyDict({

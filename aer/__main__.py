@@ -3,8 +3,6 @@ from __future__ import division, print_function
 import os
 import sys
 
-import file_db_handler
-
 try:
     from fabric.api import env
 except:
@@ -15,6 +13,7 @@ except:
     print( 'sudo python3 -m pip install --upgrade pip setuptools pyserial Fabric3')
     sys.exit(85)
 
+import file_db_handler
 
 # pylint: disable=I0011,E1129
 
