@@ -1,4 +1,4 @@
-# pylint: disable=I0011,E1129,E0611
+# pylint: disable=I0011,E1129,E0611,E0401
 from __future__ import absolute_import, division, print_function
 
 import datetime
@@ -20,10 +20,12 @@ from utils import EasyDict, RecursiveFormatter
 # from aer.states_db import odb
 
 
-
 def entrypoint():
     if odb.arg.libs_ensure:
         ensure_libs()
+
+    if odb.arg.libs_update:
+        update_libs()
 
     if odb.arg.libs_push:
         push_libs()
@@ -39,17 +41,32 @@ def entrypoint():
 
 
 def list_all_libs(just_local=False):
-    for libd in libs_iterator():
+    for libd in libs_tags_filter():
         if just_local and not lib_exists(libd):
             continue
         print(cyan(libd.full_path))
+        if odb.arg.list_details:
+            print_str = json.dumps(libd, indent=4)
+            print(white(print_str))
         if odb.arg.list_more_details:
-            print(json.dumps(libd, indent=4))
+            print_str = json.dumps(libd, indent=4)
+            print_str = print_str[1:]
+            print_str = print_str[:-2]
+            print_str = "{"+libd.format(print_str)+"\n}"
+            print(yellow(print_str))
+
+
+def can_push(libd):
+    if set(libd.tags).isdisjoint({"can_push", "push"}):
+        print(yellow(libd.format(
+            "Skipping {folder}. Library must contain the 'push' tag")))
+        return True
+    return False
 
 
 def push_libs():
-    for libd in libs_iterator():
-        if not libd.can_push:
+    for libd in libs_tags_filter():
+        if can_push(libd):
             continue
         if libd.obtain_type != "git_clone":
             continue
@@ -72,24 +89,37 @@ def push_libs():
             local(libd.push_command)
 
 
-def update_project(libd):
-    if not odb.arg.libs_update:
-        return False
+def libs_tags_filter():
+    # libs_list = []
+    # for libd in libs_iterator():
+    #     if odb.arg.has.tags_all and len(odb.arg.tags_all) > 0 and not set(odb.arg.tags_all).issubset(libd.tags):
+    #         continue
+    #     if odb.arg.has.tags_one and len(odb.arg.tags_one) > 0 and set(odb.arg.tags_one).isdisjoint(libd.tags):
+    #         continue
+    #     libs_list.append(libd)
+    return libs_param_filter(odb.arg.tags_all,odb.arg.tags_one)
 
-    if libd.slow and not odb.arg.including_slow:
-        print(
-            yellow(libd.format("Skipping {folder} because update slow are disabled")))
-        return False
 
-    if not lib_exists(libd):
-        print(red(libd.format("Project not found locally : {folder} ")))
-        return False
+def libs_param_filter(tags_all=[], tags_one=[]):
+    libs_list = []
+    for libd in libs_iterator():
+        if len(tags_all) > 0 and not set(tags_all).issubset(libd.tags):
+            continue
+        if len(tags_one) > 0 and set(tags_one).isdisjoint(libd.tags):
+            continue
+        # if len(tags_all) > 0 and not set(tags_all).issubset(libd.tags):
+        #     continue
+        libs_list.append(libd)
+    return libs_list
 
-    print(cyan(str(libd.root_path)) + "/" + green(str(libd.folder)), libd.url)
-    with lcd(libd.full_path):
-        # status = local(libd.update_command.format(**libd)).succeeded
-        status = local(libd.format("{update_command}")).succeeded
-    return status
+
+def libs(local_only=True, tags_all=[], tags_one=[]):
+    libs_list = []
+    for libd in libs_param_filter(tags_all=tags_all,tags_one=tags_one):
+        if not lib_exists(libd):
+            continue
+        libs_list.append(libd)
+    return libs_list
 
 
 def libs_iterator():
@@ -98,14 +128,59 @@ def libs_iterator():
             continue
         for grepo_ in lib_.get("git_repo", []):
             libd = EasyDict()
-            libd.update(odb.dft.lib_proj)
-            libd.update(grepo_)
-
-            libd.root_path = lib_get_parent_path(lib_)
-            libd.can_push = lib_.get("can_push")
-            libd.full_path = pjoin(libd.root_path, libd.folder)
-
+            populate_libd(libd, lib_, grepo_)
             yield libd
+
+
+def populate_libd(libd, libs_manager, lib_data):
+    libd.update(odb.dft.lib_proj)
+    for tr_ in odb.dft.libs_manager_to_proj:
+        if libs_manager.has[tr_]:
+            libd[tr_] = libs_manager[tr_]
+    libd.update(lib_data)
+
+    libd.root_path = lib_get_parent_path(libs_manager)
+    libd.full_path = pjoin(libd.root_path, libd.folder)
+
+    if libd.has.tags and isinstance(libd.tags, str):
+        libd.tags = libd.tags.split(" ")
+    else:
+        libd.tags = [""]
+
+    if libs_manager.has.tags:
+        libd.tags.extend(libs_manager.tags.split(" "))
+
+    libd.tags = list(set(libd.tags))
+
+
+def update_libs():
+    for libd in libs_tags_filter():
+        if not lib_exists(libd):
+            continue
+
+        if not odb.arg.libs_update:
+            continue
+
+        if is_slow(libd):
+            continue
+
+        if not lib_exists(libd):
+            print(red(libd.format("Project not found locally : {folder} ")))
+            continue
+
+        print(cyan(str(libd.root_path)) + "/" +
+              green(str(libd.folder)), libd.url)
+        with lcd(libd.full_path):
+            # status = local(libd.update_command.format(**libd)).succeeded
+            status = local(libd.format("{update_command}")).succeeded
+
+
+def is_slow(libd):
+    if "slow" in libd.tags:
+        print(magenta(libd.format(
+            "Skipping {folder}.Use '-t slow' to explicitly update 'slow' libs ")))
+        return True
+    return False
 
 
 def ensure_libs():
@@ -113,7 +188,7 @@ def ensure_libs():
     Clones/Gets all libs to the dev machine
     """
 
-    for libd in libs_iterator():
+    for libd in libs_tags_filter():
         # print( green("Getting libs for folder " + json.dumps(libd,indent=2)))
         with quiet():
             local("mkdir -p {} ".format(libd.root_path))
@@ -122,15 +197,7 @@ def ensure_libs():
             print(red("Lib must have url and folder specified " + str(libd)))
             continue
 
-        if libd.slow and not odb.arg.including_slow:
-            print(
-                yellow(libd.format("Skipping {folder} because 'slow=True' are excluded")))
-            continue
-
         fresh_get = False
-
-        if lib_exists(libd):
-            update_project(libd)
 
         if lib_exists(libd):
             pass

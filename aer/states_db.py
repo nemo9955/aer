@@ -51,7 +51,9 @@ odb.pth.esptool_py = os.path.join(
     odb.pth.trd_deploy_libs, "esptool/esptool.py")
 
 odb.pth.include_libs = [
-    os.path.join(odb.pth.trd_sketch_libs)
+    os.path.join(odb.pth.trd_sketch_libs),
+    os.path.join(odb.pth.root, "RespirMesh/RemCppCommon"),
+    os.path.join(odb.pth.root, "RespirMesh/protobuf/rem_nanopb_pb0"),
 ]
 odb.pth.docker_containers_root = [
     os.path.join(odb.pth.root, "aer-components")
@@ -120,8 +122,10 @@ odb.dft.boards_db = EasyDict({
 }
 )
 
+odb.dft.libs_manager_to_proj =["after_command","obtain_type","get_command","push_command","update_command"]
+
 odb.dft.lib_proj = EasyDict({
-    "url": None,
+    "url":    "https://github.com/{repo_path}",
     "folder": None,
     "after_command": None,
     "validate_latest": None,
@@ -130,9 +134,8 @@ odb.dft.lib_proj = EasyDict({
     "get_command": "git clone {url} {folder}",
     "push_command": "git push",
     "update_command": "git pull",
-    "slow": False,
-    "can_push": False,
-    "root_path": None
+    "root_path": None,
+    "tags": "",
 })
 
 
@@ -144,67 +147,66 @@ odb.libs_manager.BOARDS_BUILD_LIBS = EasyDict({
     "pth_full": None,
     "_transfer_type_": "update",
     "pth_alias": "trd_deploy_libs",
+    "tags": "build",
     "git_repo": [
         {
-            "url": "git@github.com:esp8266/Arduino",
+            "repo_path": "esp8266/Arduino",
             "folder": "esp8266",
             "after_command": " cd esp8266/tools && python get.py "
         },
         {
-            "url": "git@github.com:wemos/Arduino_XI.git",
+            "repo_path": "wemos/Arduino_XI",
             "folder": "XI",
             "after_command": "pwd && cd XI/ && sed -i 's/lgt8fx8e\\\\optiboot_lgt8f328d.hex/lgt8fx8e\/optiboot_lgt8f328d.hex/g' boards.txt "
         },
         {
-            "url": "git@github.com:espressif/arduino-esp32.git",
+            "repo_path": "espressif/arduino-esp32",
             "folder": "esp32",
             "after_command": " cd esp32 && git submodule update --init --recursive && cd tools && python get.py "
         },
-        # {"url": "git@github.com:thunderace/Esp8266-Arduino-Makefile.git",
+        # {"repo_path":"thunderace/Esp8266-Arduino-Makefile",
         #     "folder": "Esp8266-Arduino-Makefile",
         #     "after_command": " sudo apt-get install libconfig-yaml-perl unzip sed git python  "
         #  },
-        {"url": "git@github.com:plerup/makeEspArduino.git",
+        {"repo_path": "plerup/makeEspArduino",
             "folder": "makeEspArduino"},
-        # {"url": "git@github.com:Superhouse/esp-open-rtos.git", "folder": "esp-open-rtos",
+        # {"repo_path":"Superhouse/esp-open-rtos", "folder": "esp-open-rtos",
         #     "get_command": " git clone --recursive  {url} {folder}"},
-        # {"url": "git@github.com:pfalcon/esp-open-sdk.git", "folder": "esp-open-sdk", "slow": True,
+        # {"repo_path":"pfalcon/esp-open-sdk", "folder": "esp-open-sdk", "slow": True,
         #     "get_command": "  git clone --recursive  {url} {folder} ",
         #     "update_command": " make clean && git pull && git submodule sync && git submodule update --init && make",
         #     "after_command": "  sudo apt-get install make unrar-free autoconf automake libtool gcc g++ gperf flex bison texinfo gawk ncurses-dev libexpat-dev python-dev python python-serial sed git unzip bash help2man wget bzip2 libtool-bin"
         #  },
-        # {"url": "git@github.com:espressif/ESP8266_RTOS_SDK.git",
+        # {"repo_path":"espressif/ESP8266_RTOS_SDK",
         #     "folder": "esp-rtos-sdk"},
-        {"url": "git@github.com:espressif/esptool ",
+        {"repo_path": "espressif/esptool ",
          "folder": "esptool",
             "after_command": " sudo pip3 install pyserial  "
          }
     ]
 })
 
-odb.libs_manager.GOOGLE_PROTOBUF_1 = EasyDict({
+
+odb.libs_manager.PROTOBUFFERS = EasyDict({
     "pth_alias": "trd_party",
     "_transfer_type_": "overwrite",
+    "tags": "protobuf pbuf",
+    "push_command": "git      push",
     "git_repo": [
         {
-            "url": "git@github.com:google/protobuf.git",
+            "repo_path": "google/protobuf",
             "download_url": "https://github.com/google/protobuf",
             "update_command": "rm -rf {full_path} ",
+            "tags": "slow",
             "obtain_type": "github_latest",
             "after_command": "test -e protoc-*.zip && unzip protoc-*.zip -d {folder} && rm protoc-*.zip ",
             "validate_latest": "/google/protobuf/releases/download/\S*/protoc-\S*linux-x86_64\\.zip",
             "folder": "google_protoc"
-        }
-    ]
-})
-
-odb.libs_manager.NANOPB_PROTOBUF_1 = EasyDict({
-    "pth_alias": "trd_party",
-    "_transfer_type_": "overwrite",
-    "git_repo": [
+        },
         {
-            "url": "https://github.com/nanopb/nanopb",
+            "repo_path": "nanopb/nanopb",
             "download_url": "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9-linux-x86.tar.gz",
+            "tags": "slow",
             "obtain_type": "wget_direct",
             "update_command": "rm -rf {full_path} ",
             "after_command": "cd {root_path} && test -e nanopb-*.tar.gz && mkdir -p {folder} && rm -rf {folder}/*  && tar -xzf nanopb-*.tar.gz -C {folder} && mv {folder}/nanopb*/* {folder}/  && rm nanopb-*.tar.gz ",
@@ -216,46 +218,35 @@ odb.libs_manager.NANOPB_PROTOBUF_1 = EasyDict({
 
 odb.libs_manager.NEMO9955_LIBS_PUSH = EasyDict({
     "pth_alias": "root",
-    "can_push": True,
+    "tags": "can_push push",
     "_transfer_type_": "update",
+    "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:{repo_path}.git",
     "git_repo": [
-        {"url": "git@github.com:nemo9955/aer.git",
-            "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:nemo9955/aer.git",
+        {"repo_path": "nemo9955/aer",
             "folder": "aer"},
-        {"url": "git@github.com:nemo9955/aer-components.git",
-            "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:nemo9955/aer-components.git",
+        {"repo_path": "nemo9955/aer-components",
+            # "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:{repo_path}.git",
             "folder": "aer-components"},
-        {"url": "git@github.com:nemo9955/RespirMesh.git",
-            "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:nemo9955/RespirMesh.git",
+        {"repo_path": "nemo9955/RespirMesh",
+            # "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:{repo_path}.git",
+            "tags": "dependency dep filesystem",
             "folder": "RespirMesh"},
-        {"url": "git@github.com:nemo9955/EspCar.git",
-            "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:nemo9955/EspCar.git",
+        {"repo_path": "nemo9955/EspCar",
+            "tags": "dependency dep filesystem",
+            # "after_command": "cd {folder} && ssh -T git@github.com 2>&1  | grep successfully && git remote set-url origin  git@github.com:{repo_path}.git",
             "folder": "EspCar"}
     ]
 })
-
-# odb.libs_manager.SIMPLE_NET = EasyDict({
-#     "pth_alias": "root",
-#     "_transfer_type_": "update",
-#     "git_repo": [
-#         {
-#             "url": "https://github.com/kashimAstro/SimpleNetwork",
-#             "get_command": "git clone {url} {folder} && cd {folder} && mv .git __GIT_IGNORE_GIT",
-#             "push_command": " ",
-#             "update_command": " cd {folder} && mv __GIT_IGNORE_GIT .git && git pull && mv .git __GIT_IGNORE_GIT",
-#             "folder": "RespirMesh/SimpleNetwork"
-#         }
-#     ]
-# })
 
 
 odb.libs_manager.ARDU_NEEDED_LIBS = EasyDict({
     "pth_full": odb.pth.trd_sketch_libs,
     "pth_alias": None,
+    "tags": "dependency dep",
     "_transfer_type_": "update",
     "git_repo": [
         {
-            "url": "git@github.com:bblanchon/ArduinoJson",
+            "repo_path": "bblanchon/ArduinoJson",
             "folder": "ArduinoJson",
             # "get_command": "exit 1",
             # "after_command": " test -e ArduinoJson*.zip && unzip ArduinoJson*.zip && rm ArduinoJson*.zip ",
@@ -264,51 +255,51 @@ odb.libs_manager.ARDU_NEEDED_LIBS = EasyDict({
         },
         # {"url": "",
         #     "folder": ""},
-        # {"url": "git@github.com:marvinroger/async-mqtt-client",
+        # {"repo_path":"marvinroger/async-mqtt-client",
         #     "folder": "async-mqtt-client"},
-        # {"url": "git@github.com:baruch/esp8266_smart_home",
+        # {"repo_path":"baruch/esp8266_smart_home",
         #     "folder": "esp8266_smart_home"},
-        {"url": "git@github.com:arkhipenko/TaskScheduler",
+        {"repo_path": "arkhipenko/TaskScheduler",
             "folder": "TaskScheduler"},
-        {"url": "git@github.com:nanopb/nanopb",
+        {"repo_path": "nanopb/nanopb",
             "after_command": " cd nanopb && rm -rf dist tests examples ",
             "folder": "nanopb"
          },
-        {"url": "git@github.com:me-no-dev/ESPAsyncWebServer",
+        {"repo_path": "me-no-dev/ESPAsyncWebServer",
             "folder": "ESPAsyncWebServer"},
-        {"url": "git@github.com:me-no-dev/AsyncTCP",
+        {"repo_path": "me-no-dev/AsyncTCP",
             "folder": "AsyncTCP"},
-        {"url": "git@github.com:me-no-dev/ESPAsyncTCP",
+        {"repo_path": "me-no-dev/ESPAsyncTCP",
             "folder": "ESPAsyncTCP"},
-        # {"url": "git@github.com:AndreaLombardo/L298N",
+        # {"repo_path":"AndreaLombardo/L298N",
         #     "folder": "arduino_L298N"},
-        {"url": "git@github.com:PaulStoffregen/OneWire.git",
+        {"repo_path": "PaulStoffregen/OneWire",
             "folder": "OneWire"},
-        # {"url": "git@github.com:morrissinger/ESP8266-Websocket",
+        # {"repo_path":"morrissinger/ESP8266-Websocket",
         #     "folder": "ESP-Websocket"},
-        {"url": "git@github.com:Links2004/arduinoWebSockets.git",
+        {"repo_path": "Links2004/arduinoWebSockets",
             "folder": "WebSockets"},
-        # {"url": "git@github.com:jasoncoon/esp8266-fastled-webserver.git",
+        # {"repo_path":"jasoncoon/esp8266-fastled-webserver",
         #     "folder": "fastled-webserver"},
-        # {"url": "git@github.com:FastLED/FastLED.git",
+        # {"repo_path":"FastLED/FastLED",
         #     "folder": "FastLED"},
-        # {"url": "git@github.com:sebastienwarin/IRremoteESP8266.git",
+        # {"repo_path":"sebastienwarin/IRremoteESP8266",
         #     "folder": "IRremoteESP8266"},
-        # {"url": "git@github.com:adafruit/Adafruit_NeoPixel.git",
+        # {"repo_path":"adafruit/Adafruit_NeoPixel",
         #     "folder": "Adafruit_NeoPixel"},
-        # {"url": "git@github.com:claws/BH1750.git",
+        # {"repo_path":"claws/BH1750",
         #     "folder": "BH1750-GY30"},
-        # {"url": "git@github.com:milesburton/Arduino-Temperature-Control-Library.git",
+        # {"repo_path":"milesburton/Arduino-Temperature-Control-Library",
         #     "folder": "Arduino-Temperature-Control-Library"},
         # {"url": "https://gitlab.com/painlessMesh/painlessMesh",
         #     "folder": "PainlessMesh"},
-        # {"url": "git@github.com:adafruit/Adafruit-BMP085-Library.git",
+        # {"repo_path":"adafruit/Adafruit-BMP085-Library",
         #     "folder": "Adafruit-BMP085"},
-        # {"url": "git@github.com:adafruit/DHT-sensor-library.git",
+        # {"repo_path":"adafruit/DHT-sensor-library",
         #     "folder": "DHT-sensor"},
-        # {"url": "git@github.com:adafruit/Adafruit_Sensor.git",
+        # {"repo_path":"adafruit/Adafruit_Sensor",
         #     "folder": "Adafruit_Sensor"},
-        {"url": "git@github.com:dancol90/ESP8266Ping",
-            "folder": "ESP8266Ping"}
+        # {"repo_path":"dancol90/ESP8266Ping",
+        #     "folder": "ESP8266Ping"},
     ]
 })

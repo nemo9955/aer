@@ -1,3 +1,4 @@
+# pylint: disable=I0011,E1129,E0401,E0602,E0611
 from __future__ import absolute_import, division, print_function
 
 import copy
@@ -14,12 +15,11 @@ from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 from aer import utils
 # from aer.api import *
 from aer.file_db_handler import transfer_missing_elements, write_to_db
+from aer.commands.vcs import vcs
 # from aer.states_db import odb
 from aer.utils import pick_from_list
 from states_db import odb
 from utils import EasyDict, RecursiveFormatter
-
-# pylint: disable=I0011,E1129,E0401,E0602
 
 
 def nodes_entry():
@@ -125,7 +125,7 @@ def scan_for_boards():
 
     if odb.arg.boards_from_mdns:
         for bcnf_ in odb.boards_db.values():
-            if bcnf_.has.CHIP_ID and odb.arg.in_chip_id in val_.CHIP_ID:
+            if bcnf_.has.CHIP_ID and odb.arg.in_chip_id in bcnf_.CHIP_ID:
                 bcnf = get_board_conf(bcnf_.CHIP_ID)
                 if mdns_exists(bcnf, 1):
                     if boards_list.has[bcnf.CHIP_ID]:
@@ -173,7 +173,8 @@ def save_board_parameters(bcnf):
 
     changed = False
     transfer_missing_elements(odb.EXTRA_BUILD_FLAGS, odb.dft.EXTRA_BUILD_FLAGS)
-    transfer_missing_elements(odb.BOARD_SPECIFIC_VARS, odb.dft.BOARD_SPECIFIC_VARS)
+    transfer_missing_elements(odb.BOARD_SPECIFIC_VARS,
+                              odb.dft.BOARD_SPECIFIC_VARS)
 
     for bpar_ in basic_params:
         if bcnf.has[bpar_]:
@@ -193,11 +194,12 @@ def get_board_conf(chip_id):
     The user then can edit the generated conf to suite the board and on the next run, the specified chached conf will be used for that board ID
     """
     if chip_id not in odb.boards_db:
-        print(yellow("Creating default board config for {}; consider updating the cached config".format(chip_id)))
+        print(yellow(
+            "Creating default board config for {}; consider updating the cached config".format(chip_id)))
 
         print(green("What type of chip is {} ?".format(chip_id)))
 
-        board_defaults = pick_from_list(odb.dft.boards_db.keys() )
+        board_defaults = pick_from_list(odb.dft.boards_db.keys())
         odb.boards_db[chip_id] = EasyDict(odb.dft.boards_db[board_defaults])
 
         print(green("What type of board is {} ?".format(chip_id)))
@@ -215,8 +217,9 @@ def get_board_conf(chip_id):
     transfer_missing_elements(bcnf, odb.boards_db[chip_id])
     transfer_missing_elements(bcnf, odb.dft.boards_db[bcnf.VARIANT])
     # bcnf.EXTRA_BUILD_FLAGS.update( odb.dft.EXTRA_BUILD_FLAGS)
-    transfer_missing_elements(bcnf.EXTRA_BUILD_FLAGS,odb.EXTRA_BUILD_FLAGS)
-    transfer_missing_elements(bcnf.BOARD_SPECIFIC_VARS,odb.BOARD_SPECIFIC_VARS)
+    transfer_missing_elements(bcnf.EXTRA_BUILD_FLAGS, odb.EXTRA_BUILD_FLAGS)
+    transfer_missing_elements(
+        bcnf.BOARD_SPECIFIC_VARS, odb.BOARD_SPECIFIC_VARS)
     return bcnf
 
 
@@ -232,12 +235,13 @@ def plerup_make(bcnf):
     if bcnf.has.VARIANT:
         bcnf.ESP_ROOT = pjoin(odb.pth.trd_deploy_libs, bcnf.VARIANT)
 
-    bcnf.ESPTOOL_PY = pjoin(odb.pth.trd_deploy_libs,
-                            "esptool", "esptool.py")
+    bcnf.ESPTOOL_PY = pjoin(odb.pth.trd_deploy_libs, "esptool", "esptool.py")
 
     bcnf.SOME_DEPS = " ".join(odb.pth.include_libs)
 
-    bcnf.espmake = 'make CXXFLAGS=\'std=c++17\' '
+    bcnf.espmake = 'make  '
+    # bcnf.espmake += 'CXXFLAGS=\'std=c++17\' '
+    # bcnf.espmake += 'LDFLAGS=-T/home/me/esp-open-sdk/sdk/ld/eagle.app.v6.ld '
     if odb.arg.get("make_e", False):
         bcnf.espmake += '-e '
     if odb.arg.get("make_d", False):
@@ -432,8 +436,9 @@ def obtain_filesystem(bcnf):
         return bcnf.FILESYSTEM
 
     fs_list = []
-    for path in odb.pth.custom_libs:
-        fs_list.extend(utils.all_subdirs(path))
+    for libd in vcs.libs(tags_one=["dep", "dependancy", "filesystem"]):
+        # print(libd.full_path)
+        fs_list.extend(utils.all_subdirs(libd.full_path))
 
     all_elements = ["data", "filesystems", "filesystem"]
     fs_list = utils.elements_endswith(fs_list, all_elements)
@@ -452,8 +457,9 @@ def obtain_sketch(bcnf):
         return bcnf.SKETCH
 
     sk_list = []
-    for path in odb.pth.custom_libs:
-        sk_list.extend(utils.all_subfiles(path))
+    for libd in vcs.libs(tags_one=["dep", "dependancy"]):
+        # print(libd.full_path)
+        sk_list.extend(utils.all_subfiles(libd.full_path))
 
     all_elements = [".ino", ".c", ".cpp"]
     sk_list_src = utils.elements_endswith(sk_list, all_elements)
