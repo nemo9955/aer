@@ -5,7 +5,7 @@ import os
 from os.path import exists as fexists
 from os.path import join as pjoin
 
-from fabric.api import cd, env, execute, quiet, run,put
+from fabric.api import cd, env, execute, quiet, run,put,local
 from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 
 from aer import  utils

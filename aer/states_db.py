@@ -7,20 +7,13 @@ from os.path import join as pjoin
 
 from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 
-from utils import EasyDict, RecursiveFormatter
+from utils import EasyDict, RecursiveFormatter, local_hostname
 
 odb = EasyDict()
 
 odb.boards_db = EasyDict()
 odb.cache = EasyDict()
 odb.run = EasyDict()
-
-odb.arg = EasyDict()
-odb.var = EasyDict()
-odb.var.auto_detect = True
-odb.var.flash_baud = 115200
-odb.var.serial_baud = 115200
-
 
 odb.env = EasyDict()
 odb.env.skip_bad_hosts = True
@@ -58,6 +51,23 @@ odb.pth.include_libs = [
 odb.pth.docker_containers_root = [
     os.path.join(odb.pth.root, "aer-components")
 ]
+
+
+
+odb.arg = EasyDict()
+odb.var = EasyDict()
+odb.var.auto_detect = True
+odb.var.flash_baud = 115200
+odb.var.serial_baud = 115200
+
+odb.var.GRAFANA_ADMIN_NAME = "admin-graf"
+odb.var.GRAFANA_ADMIN_PASS = "admin.pass"
+odb.var.DEV_HOSTNAME = local_hostname()
+odb.var.docker_network_name = "something"
+odb.var.AP_SSID = "SOMEAP"
+odb.var.AP_PASS = "someap.pass"
+odb.var.HASS_CONFIG_PATH = os.path.join(odb.pth.root, "configuration.yaml")
+
 
 odb.dft = EasyDict()
 
@@ -122,7 +132,8 @@ odb.dft.boards_db = EasyDict({
 }
 )
 
-odb.dft.libs_manager_to_proj =["after_command","obtain_type","get_command","push_command","update_command"]
+odb.dft.libs_manager_to_proj = [
+    "after_command", "obtain_type", "get_command", "push_command", "update_command"]
 
 odb.dft.lib_proj = EasyDict({
     "url":    "https://github.com/{repo_path}",

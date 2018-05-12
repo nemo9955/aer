@@ -41,7 +41,7 @@ BACKUP_INFO.dexec = "docker exec "
 
 
 def entrypoint():
-    config.handle()
+    # config.handle()
     BACKUP_INFO.host_id = run("hostname").strip()
 
     if odb.arg.enumerate_files:

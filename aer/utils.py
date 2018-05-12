@@ -7,8 +7,14 @@ from os.path import join as pjoin
 from string import Formatter
 
 from fabric.api import env, lcd, local, prompt, quiet
+import socket
+
 
 # pylint: disable=I0011,E1129
+
+
+def local_hostname():
+    return socket.gethostname()
 
 
 def elements_contain(the_list, the_elements, decide_function=all):

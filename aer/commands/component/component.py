@@ -39,11 +39,11 @@ def entrypoint():
 def deploy_all():
     temp_dir = "temp"
     run("mkdir -p " + temp_dir)
-    allconfs = EasyDict()
-    allconfs.update(odb.pth)
-    allconfs.update(odb.run)
-    allconfs.update(odb.cache)
-    allconfs.var = odb.var
+    # allconfs = EasyDict()
+    # allconfs.update(odb.pth)
+    # allconfs.update(odb.run)
+    # allconfs.update(odb.cache)
+    # allconfs.var = odb.var
     with cd(temp_dir):
         # for cont_name_ in odb.arg.all_conts:
         #     cont_path = pjoin(odb.pth.docker_containers_root, cont_name_)
@@ -51,7 +51,7 @@ def deploy_all():
         # generate_meta()
         for cont_name_ in odb.arg.containers:
             if cont_name_ in odb.cache.all_containers.keys():
-                run_container(cont_name_, allconfs)
+                run_container(cont_name_, odb)
 
 
 def run_container(cont_name, the_config):
