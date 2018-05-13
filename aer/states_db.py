@@ -46,7 +46,7 @@ odb.pth.esptool_py = os.path.join(
 odb.pth.include_libs = [
     os.path.join(odb.pth.trd_sketch_libs),
     os.path.join(odb.pth.root, "RespirMesh/RemCppCommon"),
-    os.path.join(odb.pth.root, "RespirMesh/protobuf/rem_nanopb_pb0"),
+    os.path.join(odb.pth.root, "RespirMesh/protobuf/rem_nanopb_pb"),
 ]
 odb.pth.docker_containers_root = [
     os.path.join(odb.pth.root, "aer-components")

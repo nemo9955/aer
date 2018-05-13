@@ -63,3 +63,4 @@ def entrypoint():
             print(yellow("go get -u github.com/golang/protobuf/protoc-gen-go"))
 
         local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))
+        # local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))
