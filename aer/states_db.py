@@ -53,7 +53,6 @@ odb.pth.docker_containers_root = [
 ]
 
 
-
 odb.arg = EasyDict()
 odb.var = EasyDict()
 odb.var.auto_detect = True
@@ -192,8 +191,9 @@ odb.libs_manager.BOARDS_BUILD_LIBS = EasyDict({
         #     "folder": "esp-rtos-sdk"},
         {"repo_path": "espressif/esptool ",
          "folder": "esptool",
-            "update_command": "cd {full_path} && git checkout ee00d84 ",
-            "after_command": " cd {full_path} && git checkout ee00d84 && sudo pip3 install pyserial  "
+         "tags": "esptool",
+            "update_command": "git checkout ee00d84 ",
+            "after_command": " cd {folder} && git checkout ee00d84 && sudo pip3 install pyserial  "
          }
     ]
 })
