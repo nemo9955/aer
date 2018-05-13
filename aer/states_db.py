@@ -192,7 +192,8 @@ odb.libs_manager.BOARDS_BUILD_LIBS = EasyDict({
         #     "folder": "esp-rtos-sdk"},
         {"repo_path": "espressif/esptool ",
          "folder": "esptool",
-            "after_command": " sudo pip3 install pyserial  "
+            "update_command": "cd {full_path} && git checkout ee00d84 ",
+            "after_command": " cd {full_path} && git checkout ee00d84 && sudo pip3 install pyserial  "
          }
     ]
 })
