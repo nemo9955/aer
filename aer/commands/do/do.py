@@ -40,27 +40,35 @@ def entrypoint():
     #     file_db_handler.generate_user_db()
 
     if odb.arg.build_protobuf:
-        nanppb_ok = local(str("cd {0}/RespirMesh/protobuf && " +
-                              "mkdir -p {0}/RespirMesh/protobuf/rem_nanopb_pb  && " +
-                              "{0}/3rd-party/google_protoc/bin/protoc  --proto_path={0}/RespirMesh/protobuf  -omesh-packet.pb {0}/RespirMesh/protobuf/*.proto  && " +
-                              "{0}/3rd-party/nanopb_protobuf/generator/nanopb_generator.py  --output-dir={0}/RespirMesh/protobuf/rem_nanopb_pb mesh-packet.pb "
-                              ).format(odb.pth.root))
-
-        if not nanppb_ok:
-            print(cyan("Maybe run"))
-            print(yellow("sudo pip install protobuf"))
 
         go_ok = local(str(
             "cd {0}/RespirMesh/protobuf && " +
             "mkdir -p {0}/RespirMesh/protobuf/rem_go_pb && " +
-            "{0}/3rd-party/google_protoc/bin/protoc --proto_path={0}/RespirMesh/protobuf --go_out={0}/RespirMesh/protobuf/rem_go_pb  {0}/RespirMesh/protobuf/*.proto "
+            "{0}/3rd-party/protocolbuffers/bin/protoc --proto_path={0}/RespirMesh/protobuf --go_out={0}/RespirMesh/protobuf/rem_go_pb  {0}/RespirMesh/protobuf/*.proto "
         ).format(odb.pth.root)).succeeded
 
-        if not go_ok:
+        if go_ok:
+            print(green("Succeesfully creted rem_go_pb"))
+        else:
             print(cyan("Maybe run"))
             print(yellow("export GOPATH=$HOME/gopath"))
             print(yellow("export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin"))
             print(yellow("go get -u github.com/golang/protobuf/protoc-gen-go"))
+
+
+
+        nanppb_ok = local(str("cd {0}/RespirMesh/protobuf && " +
+                              "mkdir -p {0}/RespirMesh/protobuf/rem_nanopb_pb  && " +
+                              "{0}/3rd-party/protocolbuffers/bin/protoc  --proto_path={0}/RespirMesh/protobuf  -omesh-packet.pb {0}/RespirMesh/protobuf/*.proto  && " +
+                              "{0}/3rd-party/nanopb_protobuf/generator/nanopb_generator.py  --output-dir={0}/RespirMesh/protobuf/rem_nanopb_pb mesh-packet.pb "
+                              ).format(odb.pth.root)).succeeded
+
+        if nanppb_ok:
+            print(green("Succeesfully creted rem_nanopb_pb"))
+        else:
+            print(cyan("Maybe run"))
+            print(yellow("sudo pip install protobuf"))
+            print(yellow("sudo update-alternatives --config python"))
 
         local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))
         # local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))

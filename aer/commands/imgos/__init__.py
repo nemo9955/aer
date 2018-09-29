@@ -18,17 +18,17 @@ def init(parent_parser):
     # contParser.add_argument('args', nargs=argparse.REMAINDER)
     burn_group = cont_parser.add_argument_group("Burn options",
                                                 "Args for burning an image to a SD card")
-    burn_group.add_argument('--ofl', metavar="of",
+    burn_group.add_argument('--ofl', dest="ofl", metavar="of",
                             help='Path to SD card', default=None)
-    burn_group.add_argument('--ifl', metavar="if",
+    burn_group.add_argument('--ifl', dest="ifl", metavar="if",
                             help='Path of image to be burned', default=None)
-    burn_group.add_argument("-b", '--burn',
+    burn_group.add_argument("-b", '--burn', dest="burn",
                             action="store_true", help='Burn an image to card')
-    burn_group.add_argument('--bs', help='Block size', default="4M")
+    burn_group.add_argument('--bs', dest="bs", help='Block size', default="4M")
 
     write_group = cont_parser.add_argument_group("Write options",
                                                  "Used to write data to the card after burn")
-    write_group.add_argument("-w", '--write',
+    write_group.add_argument("-w", '--write', dest="write",
                              action="store_true", help='Write changes to card')
-    write_group.add_argument("-s", '--add_ssh',
+    write_group.add_argument("-s", '--add_ssh', dest="add_ssh",
                              action="store_true", help='Add shh file to enable SHH access')

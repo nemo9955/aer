@@ -47,6 +47,7 @@ odb.pth.include_libs = [
     os.path.join(odb.pth.trd_sketch_libs),
     os.path.join(odb.pth.root, "RespirMesh/RemCppCommon"),
     os.path.join(odb.pth.root, "RespirMesh/protobuf/rem_nanopb_pb"),
+    os.path.join(odb.pth.root, "EspCar/src"),
 ]
 odb.pth.docker_containers_root = [
     os.path.join(odb.pth.root, "aer-components")
@@ -203,21 +204,20 @@ odb.libs_manager.PROTOBUFFERS = EasyDict({
     "pth_alias": "trd_party",
     "_transfer_type_": "overwrite",
     "tags": "protobuf pbuf",
-    "push_command": "git      push",
     "git_repo": [
         {
-            "repo_path": "google/protobuf",
-            "download_url": "https://github.com/google/protobuf",
+            "repo_path": "protocolbuffers/protobuf",
+            "download_url": "https://github.com/protocolbuffers/protobuf",
             "update_command": "rm -rf {full_path} ",
             "tags": "slow",
             "obtain_type": "github_latest",
             "after_command": "test -e protoc-*.zip && unzip protoc-*.zip -d {folder} && rm protoc-*.zip ",
-            "validate_latest": "/google/protobuf/releases/download/\S*/protoc-\S*linux-x86_64\\.zip",
-            "folder": "google_protoc"
+            "validate_latest": "/protocolbuffers/protobuf/releases/download/\S*/protoc-\S*linux-x86_64\\.zip",
+            "folder": "protocolbuffers"
         },
         {
             "repo_path": "nanopb/nanopb",
-            "download_url": "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9-linux-x86.tar.gz",
+            "download_url": "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9.1-linux-x86.tar.gz",
             "tags": "slow",
             "obtain_type": "wget_direct",
             "update_command": "rm -rf {full_path} ",
@@ -250,6 +250,18 @@ odb.libs_manager.NEMO9955_LIBS_PUSH = EasyDict({
     ]
 })
 
+odb.libs_manager.NETWORK_LIBS = EasyDict({
+    "pth_alias": "trd_party",
+    "_transfer_type_": "overwrite",
+    "tags": "network sockets",
+    "git_repo": [
+        {
+            "repo_path": "dermesser/libsocket",
+            "folder": "libsocket",
+            "after_command": "cd {folder} && cmake CMakeLists.txt && make && make install "
+        }
+    ]
+})
 
 odb.libs_manager.ARDU_NEEDED_LIBS = EasyDict({
     "pth_full": odb.pth.trd_sketch_libs,

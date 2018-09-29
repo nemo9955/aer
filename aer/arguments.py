@@ -28,7 +28,7 @@ def init_command_line():
 
     main_parser = argparse.ArgumentParser(
         description='Command line utility for project development.', conflict_handler='resolve')
-    main_parser.add_argument("-l", "--list",
+    main_parser.add_argument("-l", "--list", dest="list",
                              action="store_true", help='List everything')
 
     child_parser = main_parser.add_subparsers(

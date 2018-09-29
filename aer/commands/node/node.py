@@ -151,7 +151,7 @@ def mdns_exists(bcnf, timeout=0.5, tries=1):
             pout = local(bcnf.format(
                 "timeout {0} ping {1} -c {2} || true", timeout, tries, address), capture=True)
             presult = re.search(
-                bcnf.format('PING {0} \(([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\)', address), pout)
+                bcnf.format(r'PING {0} \(([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\)', address), pout)
             if presult:
                 bcnf.VALID_BOARD_ADDRESS = presult.group(1)
                 print(
@@ -510,6 +510,7 @@ def run_esptool(str_args, capt=False):
 
 def esptool_entry():
     status = run_esptool(" ".join(odb.arg.passing_args), False)
+    return status
 
 
 def get_att_chip_mac(target_port):
