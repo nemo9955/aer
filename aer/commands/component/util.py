@@ -5,10 +5,10 @@ import os
 from os.path import exists as fexists
 from os.path import join as pjoin
 
-from fabric.api import cd, env, execute, quiet, run,put,local
+from fabric.api import cd, env, execute, quiet, run, put, local
 from fabric.colors import blue, cyan, green, magenta, red, white, yellow
 
-from aer import  utils
+from aer import utils
 from states_db import odb
 
 # pylint: disable=I0011,E1129
@@ -58,6 +58,7 @@ def to_host(source, rename=None, exclude=[]):
 
     print(magenta("No valid folder/file at path " + source))
     return False
+
 
 def host_up(host_name):
     ret_msg = None
@@ -152,11 +153,21 @@ def build_latest_image(container_name, container_image, cont_root=None):
         run(" docker build -t %s . " % (container_image))
 
 
-def ensute_custom_network_bridge():
-    if odb.var.docker_network_name not in run("docker network ls"):
+def ensute_custom_network_bridge(network_name):
+    if network_name not in run("docker network ls"):
         run("docker network create " +
             # " --driver bridge " +
-            " --subnet 192.168.59.0/8 {} ".format(odb.var.docker_network_name))
+            # " --subnet 192.168.59.0/8  " +
+            " {} ".format(network_name))
+
+
+
+# def ensute_custom_network_bridge():
+#     if odb.var.docker_network_name not in run("docker network ls"):
+#         run("docker network create " +
+#             # " --driver bridge " +
+#             # " --subnet 192.168.59.0/8  " +
+#             " {} ".format(odb.var.docker_network_name))
 
 
 # if [[ -e $CURRENT_PATH/Dockerfile ]]; then

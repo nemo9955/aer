@@ -126,12 +126,12 @@ def select_card():
     keywordsSet = set(["MMC", "mmc", "card", "SDHC", "SD"])
     print("Please insert SD card now.")
     with quiet():
-        str_time = str(local("dmesg|tail -n 1", capture=True)
+        str_time = str(local("sudo dmesg|tail -n 1", capture=True)
                        ).strip().split("]")[0][1:]
         print(str_time)
 
         lastTimestamp = float(str_time)
-    # lastTimestamp  = str(local("dmesg|tail -n 1",capture=True)).strip()
+    # lastTimestamp  = str(local("sudo dmesg|tail -n 1",capture=True)).strip()
     print(lastTimestamp)
 
     sdPath = ""
@@ -139,7 +139,7 @@ def select_card():
         fastprint(".")
         time.sleep(1)
         with quiet():
-            dmsgTail = local("dmesg|tail", capture=True).split("\n")
+            dmsgTail = local("sudo dmesg|tail", capture=True).split("\n")
         # print( dmsgTail)
         possibleSDCard = False
         detectedActivity = False
@@ -153,7 +153,7 @@ def select_card():
                     detectedActivity = True
                     print("Detected activity.")
                     with quiet():
-                        print(yellow(local("dmesg|tail -n 4", capture=True)))
+                        print(yellow(local("sudo dmesg|tail -n 4", capture=True)))
 
                 if not possibleSDCard:
                     if len(rowSet.intersection(keywordsSet)) == 0 or "removed" in rowSet:
