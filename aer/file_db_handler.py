@@ -53,6 +53,7 @@ def generate_user_db():
 
 def load_file_db(db_path):
     if fexists(db_path):
+        print("----",db_path)
         with open(db_path) as datafile_db:
             data = json.load(datafile_db, object_hook=EasyDict)
             transfer_missing_elements(odb, data)
@@ -75,6 +76,12 @@ def transfer_missing_elements(target_dict, source_dict):
             elif transfer_type == "overwrite":
                 target_dict[key_] = val_
 
+        # elif key_ not in target_dict:
+        #     target_dict[key_] = copy.deepcopy(source_dict[key_])
+        else :
+            target_dict[key_] = copy.deepcopy(source_dict[key_])
+
+
         # if isinstance(source_dict[key_],list) and  isinstance(source_dict[key_][0],dict):
         #     if key_ not in target_dict:
         #         target_dict[key_] = []
@@ -91,8 +98,6 @@ def transfer_missing_elements(target_dict, source_dict):
         #             target_dict[key_].append(temp)
         #             transfer_missing_elements(temp, src_)
 
-        elif key_ not in target_dict:
-            target_dict[key_] = copy.deepcopy(source_dict[key_])
 
 # def key_matches(key_, dic1_, dic2_):
 # return  key_ in dic1_ and dic1_[key_] is not None and key_ in dic2_ and
