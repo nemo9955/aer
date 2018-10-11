@@ -53,7 +53,7 @@ def generate_user_db():
 
 def load_file_db(db_path):
     if fexists(db_path):
-        print("----",db_path)
+        # print("----",db_path)
         with open(db_path) as datafile_db:
             data = json.load(datafile_db, object_hook=EasyDict)
             transfer_missing_elements(odb, data)

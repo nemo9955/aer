@@ -169,7 +169,7 @@ def update_libs():
             continue
 
         print(cyan(str(libd.root_path)) + "/" +
-              green(str(libd.folder)), libd.url)
+              green(str(libd.folder)), libd.format(libd.url))
         with lcd(libd.full_path):
             # status = local(libd.update_command.format(**libd)).succeeded
             status = local(libd.format("{update_command}")).succeeded

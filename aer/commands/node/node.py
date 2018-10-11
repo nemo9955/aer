@@ -32,7 +32,6 @@ def nodes_entry():
         # print_board_meta(bcnf)
         status_ok = True
         if bcnf.has.CHIP_ID:
-
             print(yellow("Active board chip id : " + bcnf.CHIP_ID))
 
         save_board_parameters(bcnf)
@@ -216,6 +215,7 @@ def get_board_conf(chip_id):
     bcnf = EasyDict()
     transfer_missing_elements(bcnf, odb.boards_db[chip_id])
     transfer_missing_elements(bcnf, odb.dft.boards_db[bcnf.VARIANT])
+    transfer_missing_elements(bcnf, odb.boards_db[chip_id])
     # bcnf.EXTRA_BUILD_FLAGS.update( odb.dft.EXTRA_BUILD_FLAGS)
     transfer_missing_elements(bcnf.EXTRA_BUILD_FLAGS, odb.EXTRA_BUILD_FLAGS)
     transfer_missing_elements(

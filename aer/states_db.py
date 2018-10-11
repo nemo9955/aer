@@ -46,6 +46,8 @@ odb.pth.esptool_py = os.path.join(
 odb.pth.include_libs = [
     os.path.join(odb.pth.trd_sketch_libs),
     os.path.join(odb.pth.root, "RespirMesh/RemCppCommon"),
+    os.path.join(odb.pth.root, "3rd-party/nanopb_protobuf"),
+    os.path.join(odb.pth.root, "3rd-party/nanopb_protobuf/extra"),
     os.path.join(odb.pth.root, "RespirMesh/protobuf/rem_nanopb_pb"),
     os.path.join(odb.pth.root, "EspCar/src"),
 ]
@@ -193,8 +195,8 @@ odb.libs_manager.BOARDS_BUILD_LIBS = EasyDict({
         {"repo_path": "espressif/esptool ",
          "folder": "esptool",
          "tags": "esptool",
-            "update_command": "git checkout ee00d84 ",
-            "after_command": " cd {folder} && git checkout ee00d84 && sudo pip3 install pyserial  "
+            # "update_command": "git checkout ee00d84 ",
+            # "after_command": " cd {folder} && git checkout ee00d84 && sudo pip3 install pyserial  "
          }
     ]
 })
@@ -286,7 +288,9 @@ odb.libs_manager.ARDU_NEEDED_LIBS = EasyDict({
         {"repo_path": "arkhipenko/TaskScheduler",
             "folder": "TaskScheduler"},
         {"repo_path": "nanopb/nanopb",
-            "after_command": " cd nanopb && rm -rf dist tests examples ",
+            "after_command": " cd nanopb ; rm -rf dist tests examples ",
+            "update_command": "git pull && {after_command} ",
+            "tags": "special",
             "folder": "nanopb"
          },
         {"repo_path": "me-no-dev/ESPAsyncWebServer",
