@@ -55,8 +55,6 @@ def entrypoint():
             print(yellow("export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin"))
             print(yellow("go get -u github.com/golang/protobuf/protoc-gen-go"))
 
-
-
         nanppb_ok = local(str("cd {0}/RespirMesh/protobuf && " +
                               "mkdir -p {0}/RespirMesh/protobuf/rem_nanopb_pb  && " +
                               "{0}/3rd-party/protocolbuffers/bin/protoc  --proto_path={0}/RespirMesh/protobuf  -omesh-packet.pb {0}/RespirMesh/protobuf/*.proto  && " +
@@ -70,5 +68,5 @@ def entrypoint():
             print(yellow("sudo pip install protobuf"))
             print(yellow("sudo update-alternatives --config python"))
 
-        local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))
+        # local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))
         # local("cp {0}/RespirMesh/protobuf/rem_nanopb_pb/*  {0}/RespirMesh/RespirMeshClient/examples/  ".format(odb.pth.root))
