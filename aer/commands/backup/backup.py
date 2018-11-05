@@ -238,7 +238,6 @@ def restore_datasources(root_folder):
 
 def restore_dashboards(root_folder):
     grafana_url = "localhost:3000"
-    # grafana_url = "localhost/grafana"
     db_fils = run("ls -1 {}/*.json".format(root_folder)
                   ).replace("\r", "").split("\n")
     for dash_name in db_fils:
@@ -261,13 +260,14 @@ def restore_dashboards(root_folder):
 
 
 def grafana_retrive_dashboards(parent_local_folder):
+    grafana_url = "localhost:3000"
     local("mkdir -p " + parent_local_folder)
     dashds = json.loads(
-        run("curl http://localhost/grafana/api/search/ ").strip())
+        run("curl http://{}/api/search/ ".format(grafana_url)).strip())
 
     for db_ in dashds:
         print(db_)
-        bd_pth = "http://localhost/grafana/api/dashboards/" + db_["uri"]
+        bd_pth = "http://{}/api/dashboards/{}".format(grafana_url,db_["uri"])
         write_dashboard(bd_pth, parent_local_folder)
 
 
@@ -304,6 +304,7 @@ def write_dashboard(get_path, parent_folder, isHome=False):
 
 
 def grafana_retrive_datasources(parent_local_folder):
+    grafana_url = "localhost:3000"
     dat = EasyDict()
     com = RecursiveFormatter(dat, BACKUP_INFO)
     dat.grafana_type_export = "datasource"
@@ -313,8 +314,9 @@ def grafana_retrive_datasources(parent_local_folder):
     with quiet():
         # TODO in case values are not found, prompt user for them !!!!, Maybe
         # generalize the procedure
-        dasource = json.loads(run("curl http://{}:{}@localhost/grafana/api/datasources/ ".format(
-            odb.var.GRAFANA_ADMIN_NAME, odb.var.GRAFANA_ADMIN_PASS)).strip())
+        dash_json = run("curl http://{}:{}@{}/api/datasources/ ".format(odb.var.GRAFANA_ADMIN_NAME, odb.var.GRAFANA_ADMIN_PASS,grafana_url)).strip()
+        print(dash_json)
+        dasource = json.loads(dash_json)
 
     local("mkdir -p " + parent_local_folder)
     for datas_dict in dasource:
