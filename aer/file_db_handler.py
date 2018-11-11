@@ -57,29 +57,39 @@ def load_file_db(db_path):
         with open(db_path) as datafile_db:
             data = json.load(datafile_db, object_hook=EasyDict)
             transfer_missing_elements(odb, data)
+            # print("..............",json.dumps(odb.EXTRA_BUILD_FLAGS, indent=2))
 
 
-def transfer_missing_elements(target_dict, source_dict):
+def transfer_missing_elements(target_dict, source_dict, transfer_type=None):
     """Transferes missing elements from source to target recusevly
     """
 
+    if transfer_type is None:
+        transfer_type = source_dict.get("_transfer_type_", "recursive")
+
     for key_, val_ in source_dict.items():
+        # print(key_,isinstance(val_, dict), val_)
         if isinstance(val_, dict):
             if key_ not in target_dict:
                 target_dict[key_] = EasyDict()
-            transfer_type = val_.get("_transfer_type_", "recursive")
+            if transfer_type is None:
+                transfer_type = val_.get("_transfer_type_", "recursive")
+            # print("***********   ",transfer_type)
 
             if transfer_type == "recursive":
-                transfer_missing_elements(target_dict[key_], val_)
+                transfer_missing_elements(target_dict[key_], val_, transfer_type)
             elif transfer_type == "update":
                 target_dict[key_].update(val_)
             elif transfer_type == "overwrite":
-                target_dict[key_] = val_
+                target_dict[key_] = copy.deepcopy(source_dict[key_])
+                # target_dict[key_] = val_
 
-        # elif key_ not in target_dict:
-        #     target_dict[key_] = copy.deepcopy(source_dict[key_])
-        else :
+        elif key_ not in target_dict:
             target_dict[key_] = copy.deepcopy(source_dict[key_])
+            # target_dict[key_] = val_
+        # else :
+        #     target_dict[key_] = val_
+            # target_dict[key_] = copy.deepcopy(source_dict[key_])
 
 
         # if isinstance(source_dict[key_],list) and  isinstance(source_dict[key_][0],dict):
@@ -107,3 +117,69 @@ def transfer_missing_elements(target_dict, source_dict):
 def write_to_db(file_path, file_dict):
     with open(file_path, 'w') as write_file:
         json.dump(file_dict, write_file, indent=2)
+
+def run_tests():
+    print("TESTING ___________ ")
+
+    print("TESTING transfer_missing_elements ")
+    d1=EasyDict()
+    d1.a=1
+    d1.b=1
+    d1.c=1
+    d1.d=EasyDict()
+    d1.d.a=1
+    d1.d.b=1
+
+    d1._transfer_type_="update"
+    d2=EasyDict()
+    d2.a=20
+    d2.c=20
+    d2.d=EasyDict()
+    d2.d.a=20
+    d2.d.x=20
+    transfer_missing_elements(d2,d1)
+    expected = EasyDict({"a": 20, "d": {"a": 1, "x": 20, "b": 1}, "c": 20, "_transfer_type_": "update", "b": 1})
+    # print(json.dumps(d2,indent=2))
+    # print(json.dumps(d2))
+    if d2 != expected :
+        print(expected, "!=", json.dumps(d2) )
+        raise Exception("transfer_missing_elements is different")
+
+
+    d1._transfer_type_="recursive"
+    d2=EasyDict()
+    d2.a=20
+    d2.c=20
+    d2.d=EasyDict()
+    d2.d.a=20
+    d2.d.x=20
+    transfer_missing_elements(d2,d1)
+    expected = EasyDict({"a": 20, "d": {"a": 20, "x": 20, "b": 1}, "b": 1, "c": 20, "_transfer_type_": "recursive"})
+    # print(json.dumps(d2,indent=2))
+    # print(json.dumps(d2))
+    if d2 != expected :
+        print(expected, "!=", json.dumps(d2) )
+        raise Exception("transfer_missing_elements is different")
+
+    d1._transfer_type_="overwrite"
+    d2=EasyDict()
+    d2.a=20
+    d2.c=20
+    d2.d=EasyDict()
+    d2.d.a=20
+    d2.d.x=20
+    transfer_missing_elements(d2,d1)
+    expected = EasyDict({"a": 20, "d": {"a": 1, "b": 1}, "c": 20, "b": 1, "_transfer_type_": "overwrite"})
+    # print(json.dumps(d2,indent=2))
+    # print(json.dumps(d2))
+    if d2 != expected :
+        print(expected, "!=", json.dumps(d2) )
+        raise Exception("transfer_missing_elements is different")
+
+
+
+
+
+
+if __name__ == "__main__":
+    run_tests()

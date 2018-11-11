@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import time
+import json
 from os.path import exists as fexists
 from os.path import join as pjoin
 
@@ -171,6 +172,9 @@ def save_board_parameters(bcnf):
                     "HTTP_URI", "HTTP_PWD", "HTTP_USR", "HTTP_ADDR"]
 
     changed = False
+
+    # print(json.dumps(odb.EXTRA_BUILD_FLAGS, indent=2))
+
     transfer_missing_elements(odb.EXTRA_BUILD_FLAGS, odb.dft.EXTRA_BUILD_FLAGS)
     transfer_missing_elements(odb.BOARD_SPECIFIC_VARS,
                               odb.dft.BOARD_SPECIFIC_VARS)
