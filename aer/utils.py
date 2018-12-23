@@ -54,6 +54,15 @@ def all_subdirs(root_folder):
     return dir_list
 
 
+def all_child_dirs(root_folder):
+    dir_list = os.listdir(root_folder)
+    path_dir_list = []
+    for ch_dir in dir_list :
+        path_dir_list.append(pjoin(root_folder, ch_dir))
+
+    return path_dir_list
+
+
 def pick_valid(options):
     return lambda v: options[int(v)]
 

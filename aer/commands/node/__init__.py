@@ -53,6 +53,8 @@ def init(pparser):
     make_action.add_argument('-f', "--flash", dest="flash",
                              help='Flash the node', action="store_true")
 
+    search_qu.add_argument('-r', "--remove-cache", dest="remove_cache", action="store_true",
+                           help='Remove cacched data like SKETCH')
     search_qu.add_argument('-i', "--in-chip-id", dest="in_chip_id", metavar="id",
                            help='Chip ID in HEX representation MUST contain', default="")
     search_qu.add_argument('-s', "--in-sketch", dest="in_sketch", metavar="search",

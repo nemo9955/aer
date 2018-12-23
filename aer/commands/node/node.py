@@ -32,6 +32,10 @@ def nodes_entry():
     for bcnf in boards_list.values():
         # print_board_meta(bcnf)
         status_ok = True
+
+        if odb.arg.remove_cache:
+            bcnf.pop("SKETCH", None)
+
         if bcnf.has.CHIP_ID:
             print(yellow("Active board chip id : " + bcnf.CHIP_ID))
 
@@ -242,6 +246,8 @@ def plerup_make(bcnf):
     bcnf.ESPTOOL_PY = pjoin(odb.pth.trd_deploy_libs, "esptool", "esptool.py")
 
     bcnf.SOME_DEPS = " ".join(odb.pth.include_libs)
+    bcnf.SOME_DEPS += " " + " ".join( utils.all_child_dirs(odb.pth.trd_sketch_libs) )
+
 
     bcnf.espmake = 'make  '
     # bcnf.espmake += 'CXXFLAGS=\'std=c++17\' '
