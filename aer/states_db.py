@@ -62,6 +62,7 @@ odb.var.auto_detect = True
 odb.var.flash_baud = 115200
 odb.var.serial_baud = 115200
 
+
 odb.var.GRAFANA_ADMIN_NAME = "admin-graf"
 odb.var.GRAFANA_ADMIN_PASS = "admin.pass"
 odb.var.DEV_HOSTNAME = local_hostname()
