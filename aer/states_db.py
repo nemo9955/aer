@@ -165,7 +165,8 @@ odb.libs_manager.BOARDS_BUILD_LIBS = EasyDict({
         {
             "repo_path": "esp8266/Arduino",
             "folder": "esp8266",
-            "after_command": " cd esp8266/tools && python get.py "
+            "update_command": "cd esp8266 ; git checkout 614f7c3 ",
+            "after_command": " cd esp8266 ; git checkout 614f7c3 ;  cd tools && python get.py "
         },
         {
             "repo_path": "wemos/Arduino_XI",
@@ -297,6 +298,10 @@ odb.libs_manager.ARDU_NEEDED_LIBS = EasyDict({
             "tags": "special",
             "folder": "nanopb"
          },
+        {"repo_path": "horihiro/esp8266-google-tts",
+            "folder": "esp8266-google-tts"},
+        {"repo_path": "horihiro/esp8266-google-home-notifier",
+            "folder": "esp8266-google-home-notifier"},
         {"repo_path": "wemos/LOLIN_HP303B_Library",
             "folder": "LOLIN_HP303B_Library"},
         {"repo_path": "wemos/WEMOS_DHT12_Arduino_Library",
